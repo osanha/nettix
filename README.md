@@ -267,7 +267,7 @@ This project is based on Netty 3.x and targets legacy Java environments.
 
 ### Maven
 
-This library is distributed via JitPack with a verified custom domain (`io.nettix`), following the standard Maven group ID convention.
+Available on JitPack. You can easily include this library in your project using the following Maven coordinates:
 
 Add the JitPack repository to your `pom.xml`:
 
@@ -285,7 +285,7 @@ Add the dependency:
 ```xml
 <dependencies>
     <dependency>
-        <groupId>io.nettix</groupId>
+        <groupId>com.github.osanha</groupId>
         <artifactId>nettix</artifactId>
         <version>3.10</version>
     </dependency>
