@@ -6,7 +6,12 @@
 
     <groupId>io.nettix</groupId>
     <artifactId>nettix</artifactId>
-    <version>3.10</version>
+    <version>3.1.0</version>
+    <packaging>jar</packaging>
+
+    <name>Nettix</name>
+    <description>Netty 3.x based high-level custom framework</description>
+    <url>https://github.com/osanha/nettix</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -45,7 +50,9 @@
         <profile>
             <id>legacy</id>
             <properties>
-                <maven.compiler.release>1.6</maven.compiler.release>
+                <!-- To build for Java 6, you must use JDK 8 or earlier. -->
+                <maven.compiler.source>1.6</maven.compiler.source>
+                <maven.compiler.target>1.6</maven.compiler.target>
             </properties>
             <dependencies>
                 <dependency>
@@ -67,7 +74,8 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.13.0</version> </plugin>
+                <version>3.13.0</version>
+            </plugin>
         </plugins>
     </build>
 
