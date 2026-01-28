@@ -6,15 +6,18 @@
 
     <groupId>io.nettix</groupId>
     <artifactId>nettix</artifactId>
-    <version>3.1.0</version>
+    <version>3.1.1</version>
     <packaging>jar</packaging>
 
     <name>Nettix</name>
-    <description>Netty 3.x based high-level custom framework</description>
+    <description>Netty 3.10.x based high-level custom framework</description>
     <url>https://github.com/osanha/nettix</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- To build for Java 6, you must use JDK 8 or earlier. -->
+        <maven.compiler.source>1.6</maven.compiler.source>
+        <maven.compiler.target>1.6</maven.compiler.target>
     </properties>
 
     <dependencies>
@@ -23,58 +26,71 @@
             <artifactId>netty</artifactId>
             <version>3.10.6.Final</version>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.36</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.2.13</version>
+        </dependency>
     </dependencies>
 
-    <profiles>
-        <profile>
-            <id>modern</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <maven.compiler.release>11</maven.compiler.release>
-            </properties>
-            <dependencies>
-                <dependency>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                    <version>2.0.17</version>
-                </dependency>
-                <dependency>
-                    <groupId>ch.qos.logback</groupId>
-                    <artifactId>logback-classic</artifactId>
-                    <version>1.5.18</version>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>legacy</id>
-            <properties>
-                <!-- To build for Java 6, you must use JDK 8 or earlier. -->
-                <maven.compiler.source>1.6</maven.compiler.source>
-                <maven.compiler.target>1.6</maven.compiler.target>
-            </properties>
-            <dependencies>
-                <dependency>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                    <version>1.7.36</version>
-                </dependency>
-                <dependency>
-                    <groupId>ch.qos.logback</groupId>
-                    <artifactId>logback-classic</artifactId>
-                    <version>1.2.13</version>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
+    <repositories>
+        <repository>
+            <id>central</id>
+            <url>https://repo.maven.apache.org/maven2</url>
+        </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
 
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.13.0</version>
+                <version>3.1</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.6.3</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <doclint>none</doclint>
+                            <source>1.6</source>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
