@@ -1,19 +1,66 @@
 # nettix
 
-A high-level networking framework built on Netty 3.x for building high-performance asynchronous servers and clients with ease.
+A high-level Netty-based framework for building diverse asynchronous
+server and client protocols quickly, reliably, and at scale.
 
 ## Overview
 
-**nettix** is a high-performance networking framework built on Netty 3.x, designed for developing robust asynchronous servers and clients.
+**nettix** is a high-level networking framework built on Netty 3.x that
+enables fast and reliable development of high-performance asynchronous
+servers and clients across a wide range of protocols.
 
-This framework was originally engineered to develop **high-volume, high-availability ESB (Enterprise Service Bus) hybrid API gateways** in demanding production environments. Its core design philosophy was to achieve maximum reliability and performance with **zero external dependencies**, ensuring the networking layer remains self-contained and lightweight.
+It was created while building a **RESTful ESB Hybrid API Gateway** from
+scratch—a system that had to communicate simultaneously with multiple
+carrier SMSCs, vehicle terminals, and external systems using
+heterogeneous protocols such as HTTP, WebSocket, REST, SOAP, SMPP,
+message queues, and proprietary TCP-based messaging.
 
-While Netty has evolved, `nettix` stands as a record of high-concurrency engineering, having been battle-tested in systems handling massive traffic and complex protocol integrations.
+Despite protocol differences, most servers and clients ultimately fall
+into a small set of communication patterns:
+
+- Long-lived connections vs request/response messaging
+- Connection keep-alive via heartbeat or enquire-link (ping-pong)
+- Automatic reconnection on connection loss
+- Consistent socket configuration, timeout handling, logging, and
+  exception mapping
+- **SSL/TLS as a transparent layer**—any protocol becomes its secure
+  variant (HTTP→HTTPS, WS→WSS, TCP→TLS) by simply adding SSL to the
+  pipeline
+
+nettix systematizes these recurring patterns into a cohesive high-level
+API. Users focus only on implementing protocol-specific logic, while
+nettix handles connection lifecycle management, failure recovery, and
+common communication behaviors in a unified and predictable way.
+
+The RESTful ESB Hybrid API Gateway built on nettix has been running in
+**global multi-region high-availability** deployments for over a decade,
+proven in production environments demanding high performance, high
+efficiency, and continuous availability.
 
 ### Key Highlights
-* **Proven Stability:** Successfully managed high-availability distributed systems for over a decade.
-* **Self-Contained:** Built entirely on Netty 3.x to eliminate overhead from external infrastructure.
-* **Protocol Foundation:** Built-in HTTP/WebSocket with a streamlined API for custom protocol implementations (e.g., SMPP, OCPP).
+
+* **Protocol-Centric Abstraction**
+  Build any server or client protocol by implementing only the protocol
+  logic, without repeatedly solving connection and failure handling.
+
+* **Transparent SSL/TLS Integration**
+  Add security to any protocol by inserting SSL into the pipeline—no
+  protocol-specific changes required. Includes unified certificate and
+  keystore management, session reuse, and handshake lifecycle handling
+  for both client and server.
+
+* **Battle-Tested at Scale**
+  Proven in a RESTful ESB Hybrid API Gateway operating across global
+  multi-region HA clusters for over 10 years, handling massive traffic
+  and complex protocol integrations.
+
+* **Standardized Communication Patterns**
+  Built-in support for common protocol behaviors such as heartbeats,
+  enquire-link keep-alives, automatic reconnection, and timeout control.
+
+* **Self-Contained and Lightweight**
+  Built entirely on Netty 3.x with zero external infrastructure
+  dependencies.
 
 ## Built with nettix
 
@@ -24,31 +71,123 @@ Practical applications developed using the nettix framework:
 
 ## Features
 
-### Core Features
-- **High-level Channel Management**: Simplified server/client lifecycle management with automatic reconnection
-- **HTTP Client/Server**: Full-featured async HTTP with connection pooling, compression, and keep-alive
-- **WebSocket Support**: WebSocket client and server handlers with upgrade support
-- **SSL/TLS**: Easy SSL configuration for secure connections with session reuse
-- **Utility Classes**: Lifecycle management, scheduled executors, timeout maps, and more
+### Protocol-Oriented Abstractions
 
-### Protocol Development Features
-- **Automated Exception Handling**: Communication and protocol exceptions are automatically mapped to appropriate HTTP status codes
+nettix provides high-level abstractions that systematize recurring
+communication patterns found in most server and client protocols.
+
+- **High-level Channel Management**
+  Unified lifecycle management for servers and clients, including
+  startup, shutdown, and automatic reconnection on failure.
+
+- **Persistent Client Connections**
+  Built-in support for long-lived client connections with configurable
+  retry strategies and reconnection intervals via
+  `PersistentClientChannelManager`.
+
+- **Request/Response Messaging**
+  First-class support for short-lived, message-based protocols such as
+  HTTP and REST-style communication.
+
+---
+
+### SSL/TLS as a Pipeline Layer
+
+nettix treats SSL/TLS as a protocol-agnostic layer that can be inserted
+into any channel pipeline, transforming any protocol into its secure
+variant without modifying protocol logic.
+
+- **Unified Certificate Management** (`SslManager`)
+  Load and manage multiple keystores (PKCS12, JKS) with named
+  references. Configure once, reuse across servers and clients.
+
+- **Protocol-Agnostic Security**
+  The same SSL configuration works for HTTP, WebSocket, SMPP, or any
+  custom TCP protocol—just add SSL handler to the pipeline.
+
+- **Session Reuse & Performance**
+  SSL session caching and reuse for reduced handshake overhead in
+  high-throughput scenarios.
+
+- **Handshake Lifecycle** (`SslHandshaker`)
+  Built-in handler for SSL handshake completion events, enabling
+  protocol logic to proceed only after secure connection is established.
+
+```java
+// Any protocol becomes secure by adding SSL
+SslManager.loadKeyStore("my-cert", "PKCS12", "/path/to/cert.p12", "pass", "keypass");
+
+// HTTP → HTTPS
+HttpServer httpsServer = new HttpServer("SecureAPI", 8443, "my-cert");
+
+// Custom protocol → Custom protocol over TLS
+public class MyProtocolServer extends ServerChannelManager {
+    public MyProtocolServer(int port, String sslName) {
+        super("MyProtocol", port);
+        setSslEngineFactory(SslManager.createServerSslFactory(sslName));
+    }
+}
+```
+
+---
+
+### Built-in Communication Patterns
+
+Common protocol behaviors are provided as reusable handlers instead of
+being reimplemented per protocol.
+
+- **Heartbeat-Based Keep-Alive** (`HeartbeatHandler<T>`)
+  Periodic heartbeat sending with read-timeout detection for
+  connection-oriented protocols.
+
+- **Enquire-Link Pattern** (`EnquireLinkHandler<T>`)
+  Standardized ping-pong keep-alive widely used in carrier-grade
+  protocols such as SMPP.
+
+- **Automatic Failure Recovery**
+  Transparent handling of connection loss, read timeouts, and protocol
+  errors with predictable recovery behavior.
+
+---
+
+### Exception Handling & Observability
+
+- **Automated Exception Mapping**
+  Communication and protocol exceptions are consistently mapped to
+  appropriate HTTP status codes when applicable:
   - `HttpException` → custom HTTP status
   - `TooLongFrameException` → 413 Request Entity Too Large
   - `CompressionException` → 406 Not Acceptable
   - Other exceptions → 400 Bad Request or 500 Internal Server Error
 
-- **Easy Protocol Implementation**: Built-in handlers for common protocol patterns
-  - `HeartbeatHandler<T>`: Periodic heartbeat message sending with read timeout detection
-  - `EnquireLinkHandler<T>`: Enquire link (ping-pong) pattern with failure handling
-  - `PersistentClientChannelManager`: Automatic reconnection on connection loss
+- **Consistent Logging Hooks**
+  Centralized logging points for connection state changes, protocol
+  errors, and unexpected disconnections.
 
-- **Connection Management**
-  - Connection pooling for HTTP keep-alive
-  - Configurable reconnection count and interval
-  - Connection timeout handling
+---
 
-- **Content Compression**: Built-in GZIP and DEFLATE support for HTTP messages
+### Transport Protocols
+
+- **HTTP Client / Server**
+  Fully asynchronous HTTP with connection pooling, keep-alive,
+  compression, and configurable timeouts.
+
+- **WebSocket Support**
+  WebSocket client and server handlers with protocol upgrade handling.
+
+---
+
+### Utilities for Protocol Implementations
+
+- **Timeout & Scheduling Utilities**
+  Read/write timeout control, scheduled executors, and retry management.
+
+- **Lifecycle Utilities**
+  Consistent start/stop semantics for all servers and clients via
+  `AbstractStartable`.
+
+- **Content Compression**
+  Built-in GZIP and DEFLATE support for HTTP messages.
 
 ## Modules
 
@@ -255,10 +394,10 @@ classDiagram
 
 This project is based on Netty 3.x and targets legacy Java environments.
 
-| Build Profile | Target | Required JDK |
-|---------------|--------|--------------|
-| modern (default) | Java 11+ | JDK 11+ |
-| legacy | Java 6 bytecode | JDK 8 or earlier |
+| Target | Required JDK |
+|--------|--------------|
+| Java 11+ | JDK 11+ |
+| Java 6 bytecode | JDK 8 or earlier |
 
 > **Note:** Legacy build is intended for archival or special-purpose environments only.
 > Modern JDKs (9+) cannot compile Java 6 targets.
@@ -267,18 +406,7 @@ This project is based on Netty 3.x and targets legacy Java environments.
 
 ### Maven
 
-Available on JitPack. You can easily include this library in your project using the following Maven coordinates:
-
-Add the JitPack repository to your `pom.xml`:
-
-```xml
-<repositories>
-    <repository>
-        <id>jitpack.io</id>
-        <url>https://jitpack.io</url>
-    </repository>
-</repositories>
-```
+Available on [![](https://jitpack.io/v/osanha/nettix.svg)](https://jitpack.io/#osanha/nettix).
 
 Add the dependency:
 
@@ -287,26 +415,59 @@ Add the dependency:
     <dependency>
         <groupId>com.github.osanha</groupId>
         <artifactId>nettix</artifactId>
-        <version>3.10</version>
+        <version>3.1.1</version>
     </dependency>
 </dependencies>
 ```
 
-### Build Profiles
+Note: The official Maven coordinates of nettix project are:
 
-The default profile is `modern`, which builds for Java 11+:
-
-```bash
-mvn clean install
+```text
+io.nettix:nettix
 ```
 
-To build for Java 6 (legacy profile), you must use JDK 8 or earlier:
+When distributed via JitPack, the groupId is resolved as com.github.osanha based on the repository owner.
 
-```bash
-mvn clean install -Plegacy
+Add the JitPack repository to your `pom.xml`:
+
+```xml
+<repositories>
+  <!--Prioritize Central repository for faster dependency resolution-->
+  <repository>
+    <id>central</id>
+    <url>https://repo.maven.apache.org/maven2</url>
+  </repository>
+  <repository>
+    <id>jitpack.io</id>
+    <url>https://jitpack.io</url>
+  </repository>
+</repositories>
 ```
 
-> **Warning:** Building the legacy profile with JDK 9 or later will fail because modern JDKs cannot target Java 6 bytecode.
+[//]: # (### Build Profiles)
+
+[//]: # ()
+[//]: # (The default profile is `modern`, which builds for Java 11+:)
+
+[//]: # ()
+[//]: # (```bash)
+
+[//]: # (mvn clean install)
+
+[//]: # (```)
+
+[//]: # ()
+[//]: # (To build for Java 6 &#40;legacy profile&#41;, you must use JDK 8 or earlier:)
+
+[//]: # ()
+[//]: # (```bash)
+
+[//]: # (mvn clean install -Plegacy)
+
+[//]: # (```)
+
+[//]: # ()
+[//]: # (> **Warning:** Building the legacy profile with JDK 9 or later will fail because modern JDKs cannot target Java 6 bytecode.)
 
 ## Quick Start
 
