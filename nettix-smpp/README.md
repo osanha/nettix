@@ -21,7 +21,7 @@ nettix-smpp provides a complete SMPP (Short Message Peer-to-Peer) protocol imple
 ## Requirements
 
 - Java 6+
-- nettix 3.11+
+- nettix-core 3.2.0+
 
 ## Installation
 
@@ -39,9 +39,9 @@ Add the dependency:
 
 ```xml
 <dependency>
-    <groupId>com.github.osanha</groupId>
+    <groupId>com.github.osanha.nettix</groupId>
     <artifactId>nettix-smpp</artifactId>
-    <version>1.0.0</version>
+    <version>3.2.0</version>
 </dependency>
 ```
 
@@ -70,7 +70,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.osanha:nettix-smpp:1.0.0")
+    implementation("com.github.osanha.nettix:nettix-smpp:3.2.0")
 }
 ```
 
@@ -932,8 +932,8 @@ classDiagram
 
 ## License
 
-MIT License
+Licensed under the Apache License, Version 2.0. See [LICENSE](../LICENSE).
 
 ## Author
 
-sanha
+Sanha Lee

@@ -41,7 +41,7 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- 모듈 간 의존은 리액터 내부에서 해결된다. JitPack 좌표를 거치지 않는다. -->
+            <!-- Inter-module dependencies resolve inside the reactor, not through JitPack coordinates. -->
             <dependency>
                 <groupId>io.nettix</groupId>
                 <artifactId>nettix-core</artifactId>

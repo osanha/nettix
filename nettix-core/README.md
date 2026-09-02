@@ -1,4 +1,4 @@
-# nettix
+# nettix-core
 
 A high-level Netty-based framework for building diverse asynchronous
 server and client protocols quickly, reliably, and at scale.
@@ -9,7 +9,7 @@ server and client protocols quickly, reliably, and at scale.
 enables fast and reliable development of high-performance asynchronous
 servers and clients across a wide range of protocols.
 
-It was created while building a **RESTful ESB Hybrid API Gateway** from
+It was created while building a **Transport-Agnostic API Gateway** from
 scratch—a system that had to communicate simultaneously with multiple
 carrier SMSCs, vehicle terminals, and external systems using
 heterogeneous protocols such as HTTP, WebSocket, REST, SOAP, SMPP,
@@ -32,7 +32,7 @@ API. Users focus only on implementing protocol-specific logic, while
 nettix handles connection lifecycle management, failure recovery, and
 common communication behaviors in a unified and predictable way.
 
-The RESTful ESB Hybrid API Gateway built on nettix has been running in
+The Transport-Agnostic API Gateway built on nettix has been running in
 **global multi-region high-availability** deployments for over a decade,
 proven in production environments demanding high performance, high
 efficiency, and continuous availability.
@@ -50,7 +50,7 @@ efficiency, and continuous availability.
   for both client and server.
 
 * **Battle-Tested at Scale**
-  Proven in a RESTful ESB Hybrid API Gateway operating across global
+  Proven in a Transport-Agnostic API Gateway operating across global
   multi-region HA clusters for over 10 years, handling massive traffic
   and complex protocol integrations.
 
@@ -413,9 +413,9 @@ Add the dependency:
 ```xml
 <dependencies>
     <dependency>
-        <groupId>com.github.osanha</groupId>
-        <artifactId>nettix</artifactId>
-        <version>3.1.1</version>
+        <groupId>com.github.osanha.nettix</groupId>
+        <artifactId>nettix-core</artifactId>
+        <version>3.2.0</version>
     </dependency>
 </dependencies>
 ```
@@ -660,8 +660,8 @@ IO_LOGGER -> SSL_HANDLER? -> CHANNEL_GROUP? -> HTTP_CLIENT_CODEC
 
 ## License
 
-MIT License
+Licensed under the Apache License, Version 2.0. See [LICENSE](../LICENSE).
 
 ## Author
 
-Sanha
+Sanha Lee

@@ -38,7 +38,7 @@ Publisher → Broker → Subscribers    Publisher ←→ Subscribers
 ## Requirements
 
 - Java 6+
-- nettix 3.1.1+
+- nettix-core 3.2.0+
 - [Kryo](https://github.com/EsotericSoftware/kryo) - Fast binary serialization
 - [eraasoft objectpool](https://mvnrepository.com/artifact/nf.fr.eraasoft/objectpool) - Kryo instance pooling
 
@@ -58,9 +58,9 @@ Add the dependency:
 
 ```xml
 <dependency>
-    <groupId>com.github.osanha</groupId>
+    <groupId>com.github.osanha.nettix</groupId>
     <artifactId>nettix-mq</artifactId>
-    <version>1.0.1</version>
+    <version>3.2.0</version>
 </dependency>
 ```
 
@@ -89,7 +89,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.osanha:nettix-mq:1.0.1")
+    implementation("com.github.osanha.nettix:nettix-mq:3.2.0")
 }
 ```
 
@@ -390,8 +390,8 @@ client.setConnectionHandler(handler);
 
 ## License
 
-MIT License
+Licensed under the Apache License, Version 2.0. See [LICENSE](../LICENSE).
 
 ## Author
 
-Sanha
+Sanha Lee
