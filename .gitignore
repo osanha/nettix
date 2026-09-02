@@ -38,6 +38,7 @@ build/
 
 # Claude / AI tools
 .claude/
+CLAUDE.md
 
 # Log files
 *.log
